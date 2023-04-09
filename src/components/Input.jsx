@@ -17,7 +17,7 @@ function Input({
   label,
 }) {
   return (
-    <div style={{ width: "100%" }}>
+    <div>
       {label && <label htmlFor={id || name}>{label}</label>}
       <StyledInput
         type={type}
@@ -30,5 +30,4 @@ function Input({
     </div>
   );
 }
-
 export default Input;
