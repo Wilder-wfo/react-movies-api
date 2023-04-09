@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import Pill from "./Pill";
 
 const Wrapper = styled.li`
   background: #f3f4f6;
