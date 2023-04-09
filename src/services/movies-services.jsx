@@ -6,9 +6,3 @@ export function getMovies(query) {
     `${BASE_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${query}`
   ).then((response) => response.json());
 }
-
-export function getGenres() {
-  return fetch(
-    `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=en-US`
-  ).then((response) => response.json());
-}
