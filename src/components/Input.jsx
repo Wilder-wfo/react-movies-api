@@ -17,7 +17,7 @@ function Input({
   label,
 }) {
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       {label && <label htmlFor={id || name}>{label}</label>}
       <StyledInput
         type={type}

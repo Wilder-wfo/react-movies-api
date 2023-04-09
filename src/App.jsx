@@ -55,6 +55,8 @@ function App() {
     gap: 8px;
     align-items: center;
     max-width: 480px;
+    padding: 16px;
+    margin: 0 auto;
   `;
   return (
     <Container>
