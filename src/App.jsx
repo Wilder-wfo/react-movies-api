@@ -40,14 +40,22 @@ function sort(movies, sortBy) {
     movies.sort((a, b) => (a[sortBy] <= b[sortBy] ? -1 : 1));
   }
 }
-function filterMovies(movies, filters) {
-  if (filters.length === 0) return movies;
-  console.log(filters);
-  console.log(movies);
+function filterByGenre(movies, genres) {
+  if (genres.length === 0) return movies;
+
   const filteredMovies = movies.filter((movie) =>
-    movie.genres.some((genre) => filters.includes(genre.toLowerCase()))
+    movie.genres.some((genre) => genres.includes(genre.toLowerCase()))
   );
   return filteredMovies;
+}
+function filterByYear(movies, years) {
+  if (years.length === 0) return movies;
+  return movies.filter((movie) => years.includes(movie.year));
+}
+function filterMovies(movies, filters) {
+  const moviesByGenres = filterByGenre(movies, filters.genres);
+  const moviesByYears = filterByYear(moviesByGenres, filters.years);
+  return moviesByYears;
 }
 function getUniqueGenres(movies) {
   const genres = new Set();
@@ -59,15 +67,23 @@ function getUniqueGenres(movies) {
   //set
   return [...genres]; //array
 }
+function getUniqueYears(movies) {
+  return [...new Set(movies.map((movie) => movie.year))];
+}
 function App() {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState({});
   const [sortBy, setSortBy] = useState("");
-  // const [crime, setCrime] = useState(false);
-  const [filterGenres, setFilterGenres] = useState([]); // ["crime","drama"]
-  const filteredMovies = filterMovies(movies, filterGenres);
+  // const [filterGenres, setFilterGenres] = useState([]); // ["crime","drama"]
+  const [filters, setFilters] = useState({
+    genres: [],
+    years: [],
+    score: { min: 0, max: Infinity },
+  });
+  const filteredMovies = filterMovies(movies, filters);
   sort(filteredMovies, sortBy);
   const uniqueGenres = getUniqueGenres(movies);
+  const uniqueYears = getUniqueYears(movies);
   async function searchMovies(query) {
     // LLamar a la api
     try {
@@ -75,6 +91,11 @@ function App() {
       const parseMovies = parsedMovies(data.results, genres);
       setMovies(parseMovies);
       setSortBy("");
+      setFilters({
+        genres: [],
+        years: [],
+        score: { min: 0, max: Infinity },
+      });      
     } catch (error) {
       console.log(error);
     }
@@ -92,9 +113,24 @@ function App() {
     const genreName = event.target.name;
     const isChecked = event.target.checked;
     if (isChecked) {
-      setFilterGenres([...filterGenres, genreName]);
+      setFilters({ ...filters, genres: [...filters.genres, genreName] });
     } else {
-      setFilterGenres(filterGenres.filter((genre) => genre != genreName));
+      setFilters({
+        ...filters,
+        genres: filters.genres.filter((genre) => genre != genreName),
+      });
+    }
+  }
+  function handleYear(event) {
+    const newYear = event.target.name;
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      setFilters({ ...filters, years: [...filters.years, newYear] });
+    } else {
+      setFilters({
+        ...filters,
+        years: filters.years.filter((year) => year != newYear),
+      });
     }
   }
   const Container = styled.div`
@@ -113,15 +149,30 @@ function App() {
       <div>
         <p>Genre</p>
         {uniqueGenres.map((genre) => (
-          <label>
+          <label key={genre}>
             <input
               type="checkbox"
               name={genre.toLowerCase()}
               id={genre.toLowerCase()}
               onChange={handleCheck}
-              checked={filterGenres.includes(genre.toLowerCase())}
+              checked={filters.genres.includes(genre.toLowerCase())}
             />
             {genre}
+          </label>
+        ))}
+      </div>
+      <div>
+        <p>Release year</p>
+        {uniqueYears.map((year) => (
+          <label key={year}>
+            <input
+              type="checkbox"
+              name={year}
+              id={year}
+              onChange={handleYear}
+              checked={filters.years.includes(year)}
+            />
+            {year}
           </label>
         ))}
       </div>
